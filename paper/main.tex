@@ -1,0 +1,141 @@
+\documentclass{article}
+
+\usepackage{iclr2026_conference,times}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{enumitem}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+
+\title{Occlusion Certificates for Persistent Object State Under Robot Self-Occlusion}
+
+\author{Anonymous Authors \\
+Anonymous Institution \\
+\texttt{anonymous@example.com}}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Robots often lose sight of an object for a reason that is neither sensor noise nor scene disappearance: the robot itself moves between the camera and the object. Most persistent-perception pipelines treat this as an ordinary missed detection, controlled by a fixed deletion patience or by a generic memory module. This paper argues that robot self-occlusion should instead be a central observation event. We introduce an action-conditioned occlusion certificate: a kinematic test that marks when the robot body makes a predicted object state unobservable, and gates deletion only under clear-view misses. A simple non-identifiability proposition shows why observation-only misses cannot distinguish object absence from robot-caused invisibility. In a controlled 2D manipulation-inspired simulator, the certificate policy improves the object-state F1 at the hardest self-occlusion setting from 0.817 for a short missed-detection tracker to 0.973, while avoiding the stale-object behavior of indiscriminate long memory (0.149 vs. 0.423 stale clear-absence rate). The result is not a claim of real-robot state of the art; it is a mechanism-level case that persistent object state needs robot-action visibility semantics.
+\end{abstract}
+
+\section{Introduction}
+
+Object persistence is easy to ask for and surprisingly easy to mis-specify. A robot needs to remember that a cup still exists while its arm passes in front of the camera, yet it also needs to delete a cup that was actually removed. In many perception stacks those two cases are collapsed into the same symbol: no detection. The resulting engineering compromise is familiar. A short patience window deletes real objects under self-occlusion; a long patience window preserves real objects but also hallucinates removed ones.
+
+The central bet of this paper is that the compromise is not merely a hyperparameter problem. The robot has privileged causal information about one class of occluders: its own body. When a commanded link intersects the line of sight to a predicted object, a missed detection is not evidence of absence in the same way as a miss in clear view. This suggests a different event alphabet for persistent object state: detected, absent-in-clear-view, and robot-certified-unobservable.
+
+This paper therefore asks a narrow question: what changes if robot self-occlusion, rather than generic temporal memory, is the mechanism that gates object deletion? We make three contributions. First, we define action-conditioned occlusion certificates for persistent object state. Second, we give a small impossibility argument showing that observation-only miss streams cannot identify absence versus self-occlusion. Third, we provide a runnable simulator that demonstrates the persistence/staleness tradeoff against a short missed-detection tracker and a long-memory tracker.
+
+The claim is intentionally scoped. We do not introduce a larger detector, a new dataset, a foundation model, an LLM planner, or a generic uncertainty head. We isolate a failure mode in robot perception and test a mechanism that changes the semantics of a missed observation.
+
+\section{Related Work and Novelty Boundary}
+
+\paragraph{Tracking and filtering.}
+Classical recursive filtering gives a language for propagating state under uncertainty \citep{kalman1960new,smith1986representation,thrun2005probabilistic}. Modern online trackers often use detection association and missed-frame patience, as in SORT, Deep SORT, and ByteTrack \citep{bewley2016sort,wojke2017deepsort,zhang2022bytetrack}. These methods make temporal persistence less novel. They do not, by themselves, make robot-body occlusion a first-class cause of missing evidence.
+
+\paragraph{Robot maps and object memory.}
+SLAM and semantic mapping maintain state across views \citep{durrant2006simultaneous,cadena2016past,teed2021droidslam}. Embodied agents also use structured memories and semantic exploration policies \citep{parisotto2018neuralmap,kolve2017ai2thor,chaplot2020object}. This literature makes long-lived spatial memory less novel. The boundary here is the update rule during the interval when the robot itself hides the object, before a later revisit can repair the map.
+
+\paragraph{Amodal perception and pose tracking.}
+Amodal segmentation, 6D pose estimation, and pose tracking address hidden geometry and partial visibility \citep{li2016amodal,xiang2018posecnn,wang2019densefusion,wen2021bundletrack,qi2019deep}. Object-centric representation learning also gives latent slots that can persist through observations \citep{greff2019multiobject,locatello2020objectcentric}. These approaches make hidden-state inference less novel. Our focus is different: when should a miss count as absence evidence?
+
+\section{Problem Setup}
+
+Let $o$ be an object with latent state $x_t$, and let $q_t$ denote the robot configuration induced by its action. A perception system receives detections $z_t$. A missed detection is often represented as a single event, $z_t=\emptyset$. We instead introduce a visibility predicate
+\[
+V(q_t, \hat{x}_t) \in \{\mathrm{clear}, \mathrm{blocked}\},
+\]
+where $V=\mathrm{blocked}$ means that the robot body intersects the sensor ray or viewing volume needed to observe the predicted object state $\hat{x}_t$.
+
+\begin{definition}[Occlusion certificate]
+An action-conditioned occlusion certificate at time $t$ is a conservative predicate $C_t(\hat{x}_t)=1$ such that, under the robot kinematic model and camera calibration, the predicted object state $\hat{x}_t$ lies in a region made unobservable by the robot body at configuration $q_t$.
+\end{definition}
+
+The certificate need not reconstruct the hidden object. It only changes the meaning of a miss. A certified miss says ``do not delete on this frame because the robot made the object unobservable.'' A clear-view miss says ``this is evidence against persistence.''
+
+\section{Method}
+
+For each tracked object, the estimator stores a predicted state $\hat{x}_t$, a presence bit, and a clear-miss counter $m_t$. The update is:
+\[
+m_{t+1} =
+\begin{cases}
+0, & \text{if the object is detected},\\
+m_t, & \text{if not detected and } C_t(\hat{x}_t)=1,\\
+m_t+1, & \text{if not detected and } C_t(\hat{x}_t)=0.
+\end{cases}
+\]
+The track is deleted only when $m_t>\tau$. This is deliberately simple. The point is not a new association metric; the point is that only clear-view misses consume deletion budget.
+
+\paragraph{What changes mechanistically.}
+A fixed missed-detection TTL treats time as the deletion variable. Long memory treats persistence as the default regardless of visibility cause. The certificate policy treats robot action and geometry as the deletion variable. This creates an asymmetry: the same missing image evidence can preserve state or delete state depending on whether the robot made the relevant line of sight unavailable.
+
+\section{A Small Impossibility Result}
+
+\begin{proposition}[Observation-only misses are not identifiable]
+Consider any estimator that observes only a sequence of detection/miss symbols and not the robot-action visibility predicate. For any interval of robot self-occlusion with miss observations, there exist two worlds, one in which the object remains present but self-occluded and one in which the object is absent, that induce the same observation sequence. Therefore no observation-only update rule can identify which world generated the misses.
+\end{proposition}
+
+\begin{proof}
+Construct world A with an object at state $x$ and a robot configuration sequence $q_{1:T}$ that blocks the sensor's line of sight to $x$ for every $t \in 1:T$. The detector therefore emits $z_t=\emptyset$ throughout the interval. Construct world B with the object absent and the same detector output $z_t=\emptyset$ for every $t$. An estimator that receives only $z_{1:T}$ is given identical inputs in A and B. Its posterior or discrete decision must therefore be the same in both worlds, so it cannot identify whether the object persisted or disappeared. The robot-action visibility predicate is extra information that breaks this equivalence by certifying that A's misses were generated under blocked visibility.
+\end{proof}
+
+The proposition is modest but important: it says that adding a better timeout cannot solve the information problem. The missing input is the cause of unobservability.
+
+\section{Experiment}
+
+\paragraph{Simulator.}
+We use a 2D camera-centered world with 14 object slots per episode. A robot arm sweeps through the field of view and creates angular self-occlusion intervals. Objects may persist or be removed. Visible objects are detected with probability $0.96$; self-occluded objects are missed. The certificate receives the robot arm angle with small noise and a conservative angular inflation. The task is to maintain the correct object-presence state over time.
+
+\paragraph{Baselines.}
+We compare three policies: (1) a short TTL tracker that deletes after three consecutive misses; (2) a long-memory tracker that keeps tracks for 30 misses; and (3) the certificate policy, which freezes the deletion counter only under robot-certified self-occlusion. This isolates the update semantics while keeping association and detector quality fixed.
+
+\begin{table}[t]
+\caption{Synthetic self-occlusion results. Keep under self-occ. is the fraction of existing self-occluded object frames where the track is retained. Stale absent is the fraction of clear-view absent frames where a removed object is still retained.}
+\label{tab:synthetic}
+\centering
+\small
+\input{experiment_table.tex}
+\end{table}
+
+\IfFileExists{../figures/persistence_tradeoff.pdf}{
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.72\linewidth]{../figures/persistence_tradeoff.pdf}
+\caption{Object-state F1 as self-occlusion width increases. The certificate policy preserves the useful part of long memory without treating every miss as harmless.}
+\label{fig:tradeoff}
+\end{figure}
+}{}
+
+\paragraph{Results.}
+Table~\ref{tab:synthetic} shows the core tradeoff. The short TTL tracker is conservative about stale absent objects, but it deletes real objects under long self-occlusions. Long memory keeps self-occluded objects, but it also keeps objects that were removed and are absent in clear view. The certificate policy improves persistence because it conditions deletion on robot-caused unobservability rather than elapsed missed frames.
+
+\section{Limitations}
+
+The evidence is synthetic and uses object identities to isolate deletion semantics. A deployed robot would need calibrated geometry, segmentation of robot links, association under clutter, state prediction during contact, and robustness to external occluders. The certificate can also be wrong: calibration error can preserve stale tracks, while an overly narrow certificate can delete real objects. These limitations are not peripheral; they define the next experimental stage.
+
+\section{Reproducibility}
+
+The repository includes the literature matrix, hostile prior-work analysis, simulator, raw episode CSV, aggregate results, and LaTeX source. The main evidence can be rerun with:
+\[
+\texttt{python scripts/run\_self\_occlusion\_experiment.py}.
+\]
+The random seed is fixed to 1601. The ICLR style file is downloaded from the official ICLR 2026 template URL recorded in the build script.
+
+\section{Conclusion}
+
+Robot self-occlusion turns object persistence from a generic memory problem into an action-conditioned observability problem. The proposed certificate mechanism is small, but it changes the central update rule: clear-view misses delete; robot-certified misses preserve. The result is a sharper novelty boundary for persistent robot perception and a concrete next step toward manipulation systems that know when their own body made an object disappear.
+
+\bibliography{references}
+\bibliographystyle{iclr2026_conference}
+
+\appendix
+\section{Literature Sweep Summary}
+
+The repository contains a 1000-record related-work matrix, a 300-record serious skim, a 230-record metadata/abstract deep read, and a 100-record hostile prior-work set. The extraction schema records the claimed problem, mechanism, hidden assumptions, fixed variables, ignored failure modes, novelty pressure, and remaining opening for each important prior-work neighborhood.
+
+\end{document}
