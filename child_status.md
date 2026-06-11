@@ -1,14 +1,15 @@
 # Child Status
 
-- Stage: PDF compiled and copied
-- Last command/tool: direct `pdflatex`, `bibtex`, `pdflatex`, `pdflatex`, extra `pdflatex`, then `Copy-Item`
+- Stage: final audit update pending push
+- Last command/tool: `gh repo view`, Desktop/Downloads PDF checks, `apply_patch`
 - Current facts:
-  - `paper/main.pdf` compiled successfully with no unresolved citation/reference warnings found in the final log scan.
-  - Final PDF copied to `C:\Users\wangz\Downloads\16.pdf`.
-  - Downloads PDF size: 165836 bytes.
+  - Public GitHub repo exists: `https://github.com/Jason-Wang313/16_object_persistence_under_robot_occlusion`.
+  - First commit pushed: `7b9439aecf0e1c512b3f5da83143fcc9cf25a9a1`.
+  - Downloads PDF exists at `C:\Users\wangz\Downloads\16.pdf` with size 165836 bytes.
+  - Desktop PDF `C:\Users\wangz\OneDrive\Desktop\16.pdf` is not present, so audit says `pending orchestrator copy`.
 - Failures:
-  - MiKTeX printed update notices, but all LaTeX/BibTeX exit codes were 0.
+  - none
 - Recovery steps:
-  - Ran one extra `pdflatex` pass after a cross-reference warning.
-- Next: create public GitHub repo, push complete repo, update `docs/final_audit.md`.
+  - none
+- Next: commit and push updated `docs/final_audit.md` and `child_status.md`, then final verification.
 
