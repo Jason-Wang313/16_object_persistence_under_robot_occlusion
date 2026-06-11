@@ -1,0 +1,2 @@
+# Optional: matplotlib is used only for the PDF/PNG plot.
+matplotlib>=3.5

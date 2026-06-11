@@ -1,0 +1,10 @@
+policy,width_deg,episodes,f1_mean,f1_se,occluded_keep_rate_mean,stale_clear_absence_rate_mean,clear_exists_missing_rate_mean,occlusion_survival_rate_mean,deletion_events_mean
+certificate,18.0,120,0.990,0.000,0.958,0.085,0.000,1.000,4.73
+long_memory,18.0,120,0.962,0.001,0.959,0.462,0.000,1.000,4.13
+ttl_short,18.0,120,0.938,0.001,0.363,0.042,0.001,0.961,44.40
+certificate,30.0,120,0.984,0.001,0.940,0.098,0.000,1.000,4.59
+long_memory,30.0,120,0.961,0.001,0.929,0.450,0.000,0.998,4.61
+ttl_short,30.0,120,0.878,0.001,0.213,0.036,0.001,0.958,40.52
+certificate,42.0,120,0.973,0.001,0.908,0.149,0.000,1.000,4.47
+long_memory,42.0,120,0.951,0.001,0.882,0.423,0.001,0.992,8.79
+ttl_short,42.0,120,0.817,0.001,0.150,0.034,0.002,0.958,38.12
