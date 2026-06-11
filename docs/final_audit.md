@@ -12,5 +12,12 @@
 10. **Paper-readiness judgment:** workshop/revise. The mechanism and audit are coherent, but hardware or high-fidelity simulation validation is needed for a strong full-conference robotics submission.
 11. **Exact Downloads PDF path:** `C:/Users/wangz/Downloads/16.pdf`.
 12. **GitHub URL:** `https://github.com/Jason-Wang313/16_object_persistence_under_robot_occlusion`.
-13. **Desktop copy status:** pending orchestrator copy.
+13. **Desktop copy status:** copied by orchestrator to `C:/Users/wangz/OneDrive/Desktop/16.pdf`.
 
+
+## Orchestrator Desktop Copy
+
+Checked: 2026-06-11 14:35:45 +01:00
+Downloads PDF: C:/Users/wangz/Downloads/16.pdf
+Desktop PDF: C:/Users/wangz/OneDrive/Desktop/16.pdf
+Result: copy script exit 0 log C:\Users\wangz\robotics_60_paper_batch\logs\desktop_copy_16_20260611_143544.log

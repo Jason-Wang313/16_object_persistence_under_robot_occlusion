@@ -1,0 +1,12 @@
+{
+  "paper": 16,
+  "repo_url": "https://github.com/Jason-Wang313/16_object_persistence_under_robot_occlusion",
+  "remote": "https://github.com/Jason-Wang313/16_object_persistence_under_robot_occlusion.git",
+  "branch": "main",
+  "pushed": true,
+  "recovery": "child",
+  "commit": "5a23aeb319cb360e22dd9e59eac779e1e0afa8f9",
+  "pdf_path": "C:/Users/wangz/Downloads/16.pdf",
+  "desktop_pdf": "C:/Users/wangz/OneDrive/Desktop/16.pdf",
+  "notes": "Child completed the build and publish; parent monitor recorded the Desktop copy after the orchestrator copy step."
+}
