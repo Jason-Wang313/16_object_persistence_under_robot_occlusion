@@ -1,0 +1,7 @@
+certificate_noise,episodes,f1_mean,occluded_keep_rate_mean,stale_clear_absence_rate_mean,clear_exists_missing_rate_mean,occlusion_survival_rate_mean
+0.00,120,0.973,0.909,0.144,0.000,1.000
+1.25,120,0.974,0.918,0.160,0.001,1.000
+3.00,120,0.974,0.915,0.142,0.000,1.000
+6.00,120,0.973,0.917,0.158,0.000,1.000
+10.00,120,0.968,0.902,0.166,0.001,0.998
+16.00,120,0.964,0.879,0.189,0.001,0.997

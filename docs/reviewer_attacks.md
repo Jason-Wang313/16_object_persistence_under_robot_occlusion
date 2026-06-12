@@ -10,3 +10,7 @@
 8. **External occluders are ignored.** Response: intentionally; the contribution isolates self-occlusion, where the robot has privileged causal knowledge.
 9. **Evaluation uses object IDs.** Response: the simulator isolates deletion semantics, not association; real systems would need association or object-slot matching.
 10. **No real robot.** Response: paper-readiness should be workshop or revise without hardware validation.
+
+## V2 calibration/certificate stress
+
+The hardening pass now quantifies the calibration dependency. At 42 degree self-occlusion, the clean certificate stress has F1 0.975, keep-under-self-occlusion 0.920, and stale clear-absence 0.143. With 50% certificate false negatives, keep-under-self-occlusion falls to 0.674 and F1 to 0.930. With 50% certificate false positives, stale clear-absence rises to 0.544 and F1 falls to 0.948. The method needs conservative robot-visibility certificates; overly narrow certificates delete real objects, while overly broad certificates preserve stale ones.

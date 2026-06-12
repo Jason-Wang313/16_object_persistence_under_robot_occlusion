@@ -132,6 +132,8 @@ def run_episode(
     n_objects: int,
     detection_prob: float,
     certificate_noise: float,
+    certificate_false_negative: float = 0.0,
+    certificate_false_positive: float = 0.0,
 ) -> Dict[str, float]:
     objects = init_objects(rng, n_objects, horizon)
     trackers = [TrackerState() for _ in objects]
@@ -157,6 +159,10 @@ def run_episode(
             true_occ = exists and is_self_occluded(obj.angle_deg, t, phase, width, speed)
             noisy_angle = obj.angle_deg + rng.gauss(0.0, certificate_noise)
             certified_occ = is_self_occluded(noisy_angle, t, phase, width + 2.0, speed)
+            if certificate_false_negative > 0.0 and certified_occ and rng.random() < certificate_false_negative:
+                certified_occ = False
+            if certificate_false_positive > 0.0 and (not certified_occ) and rng.random() < certificate_false_positive:
+                certified_occ = True
             detected = exists and (not true_occ) and (rng.random() < detection_prob)
 
             before_present = trackers[i].present
@@ -208,6 +214,8 @@ def run_episode(
         "speed": speed,
         "detection_prob": detection_prob,
         "certificate_noise": certificate_noise,
+        "certificate_false_negative": certificate_false_negative,
+        "certificate_false_positive": certificate_false_positive,
         "tp": tp,
         "fp": fp,
         "fn": fn,
@@ -297,7 +305,156 @@ def write_latex_table(summary: List[Dict[str, str]]) -> None:
     (PAPER / "experiment_table.tex").write_text("\n".join(lines), encoding="utf-8")
 
 
-def write_markdown_summary(summary: List[Dict[str, str]]) -> None:
+def run_certificate_noise_stress(rng: random.Random) -> List[Dict[str, str]]:
+    rows: List[Dict[str, float]] = []
+    episode = 0
+    for noise in [0.0, 1.25, 3.0, 6.0, 10.0, 16.0]:
+        for _ in range(120):
+            episode += 1
+            rows.append(
+                run_episode(
+                    rng=rng,
+                    episode=episode,
+                    policy="certificate",
+                    ttl=3,
+                    width=42.0,
+                    speed=1.0,
+                    horizon=160,
+                    n_objects=14,
+                    detection_prob=0.96,
+                    certificate_noise=noise,
+                )
+            )
+    groups: Dict[float, List[Dict[str, float]]] = {}
+    for row in rows:
+        groups.setdefault(float(row["certificate_noise"]), []).append(row)
+    stress = []
+    for noise, items in sorted(groups.items()):
+        stress.append(
+            {
+                "certificate_noise": f"{noise:.2f}",
+                "episodes": str(len(items)),
+                "f1_mean": f"{mean([float(i['f1']) for i in items]):.3f}",
+                "occluded_keep_rate_mean": f"{mean([float(i['occluded_keep_rate']) for i in items]):.3f}",
+                "stale_clear_absence_rate_mean": f"{mean([float(i['stale_clear_absence_rate']) for i in items]):.3f}",
+                "clear_exists_missing_rate_mean": f"{mean([float(i['clear_exists_missing_rate']) for i in items]):.3f}",
+                "occlusion_survival_rate_mean": f"{mean([float(i['occlusion_survival_rate']) for i in items]):.3f}",
+            }
+        )
+    write_csv(EXPERIMENTS / "certificate_noise_episode_results.csv", rows)
+    write_summary_csv(EXPERIMENTS / "certificate_noise_stress.csv", stress)
+    write_certificate_noise_table(stress)
+    return stress
+
+
+def run_certificate_corruption_stress(rng: random.Random) -> List[Dict[str, str]]:
+    settings = [
+        ("clean", 0.0, 0.0),
+        ("false_negative_10pct", 0.10, 0.0),
+        ("false_negative_25pct", 0.25, 0.0),
+        ("false_negative_50pct", 0.50, 0.0),
+        ("false_positive_10pct", 0.0, 0.10),
+        ("false_positive_25pct", 0.0, 0.25),
+        ("false_positive_50pct", 0.0, 0.50),
+    ]
+    rows: List[Dict[str, float]] = []
+    episode = 0
+    for label, fn_rate, fp_rate in settings:
+        for _ in range(120):
+            episode += 1
+            row = run_episode(
+                rng=rng,
+                episode=episode,
+                policy="certificate",
+                ttl=3,
+                width=42.0,
+                speed=1.0,
+                horizon=160,
+                n_objects=14,
+                detection_prob=0.96,
+                certificate_noise=1.25,
+                certificate_false_negative=fn_rate,
+                certificate_false_positive=fp_rate,
+            )
+            row["scenario"] = label
+            rows.append(row)
+    groups: Dict[str, List[Dict[str, float]]] = {}
+    for row in rows:
+        groups.setdefault(str(row["scenario"]), []).append(row)
+    stress = []
+    for label, items in groups.items():
+        stress.append(
+            {
+                "scenario": label,
+                "episodes": str(len(items)),
+                "f1_mean": f"{mean([float(i['f1']) for i in items]):.3f}",
+                "occluded_keep_rate_mean": f"{mean([float(i['occluded_keep_rate']) for i in items]):.3f}",
+                "stale_clear_absence_rate_mean": f"{mean([float(i['stale_clear_absence_rate']) for i in items]):.3f}",
+                "clear_exists_missing_rate_mean": f"{mean([float(i['clear_exists_missing_rate']) for i in items]):.3f}",
+                "occlusion_survival_rate_mean": f"{mean([float(i['occlusion_survival_rate']) for i in items]):.3f}",
+            }
+        )
+    write_csv(EXPERIMENTS / "certificate_corruption_episode_results.csv", rows)
+    write_summary_csv(EXPERIMENTS / "certificate_corruption_stress.csv", stress)
+    write_certificate_corruption_table(stress)
+    return stress
+
+
+def write_certificate_noise_table(stress: List[Dict[str, str]]) -> None:
+    selected = [row for row in stress if row["certificate_noise"] in {"0.00", "1.25", "3.00", "6.00", "10.00", "16.00"}]
+    lines = [
+        "\\begin{tabular}{lrrrr}",
+        "\\hline",
+        "Certificate noise & F1 & Keep under self-occ. & Stale absent & Survival \\\\",
+        "\\hline",
+    ]
+    for row in selected:
+        lines.append(
+            f"{row['certificate_noise']} & {row['f1_mean']} & "
+            f"{row['occluded_keep_rate_mean']} & {row['stale_clear_absence_rate_mean']} & "
+            f"{row['occlusion_survival_rate_mean']} \\\\"
+        )
+    lines.extend(["\\hline", "\\end{tabular}", ""])
+    (EXPERIMENTS / "certificate_noise_table.tex").write_text("\n".join(lines), encoding="utf-8")
+
+
+def write_certificate_corruption_table(stress: List[Dict[str, str]]) -> None:
+    selected = [
+        "clean",
+        "false_negative_25pct",
+        "false_negative_50pct",
+        "false_positive_25pct",
+        "false_positive_50pct",
+    ]
+    by_label = {row["scenario"]: row for row in stress}
+    labels = {
+        "clean": "clean",
+        "false_negative_25pct": "25\\% false negative",
+        "false_negative_50pct": "50\\% false negative",
+        "false_positive_25pct": "25\\% false positive",
+        "false_positive_50pct": "50\\% false positive",
+    }
+    lines = [
+        "\\begin{tabular}{lrrrr}",
+        "\\hline",
+        "Certificate corruption & F1 & Keep under self-occ. & Stale absent & Survival \\\\",
+        "\\hline",
+    ]
+    for label in selected:
+        row = by_label[label]
+        lines.append(
+            f"{labels[label]} & {row['f1_mean']} & {row['occluded_keep_rate_mean']} & "
+            f"{row['stale_clear_absence_rate_mean']} & {row['occlusion_survival_rate_mean']} \\\\"
+        )
+    lines.extend(["\\hline", "\\end{tabular}", ""])
+    (EXPERIMENTS / "certificate_corruption_table.tex").write_text("\n".join(lines), encoding="utf-8")
+
+
+def write_markdown_summary(
+    summary: List[Dict[str, str]],
+    noise_stress: List[Dict[str, str]],
+    corruption_stress: List[Dict[str, str]],
+) -> None:
     lines = [
         "# Experiment Summary",
         "",
@@ -324,6 +481,42 @@ def write_markdown_summary(summary: List[Dict[str, str]]) -> None:
             "## Interpretation",
             "",
             "Short TTL has low stale-object rates but loses tracks during long robot self-occlusion. Long memory preserves objects under occlusion but also preserves removed objects in clear view. The certificate policy targets the missing cause: it preserves only when robot geometry predicts unobservability, giving a better persistence/staleness tradeoff in this controlled setting.",
+            "",
+            "## V2 Certificate-Noise Stress",
+            "",
+            "The hardening stress reruns the certificate policy at 42 degree self-occlusion while increasing calibration noise in the certificate geometry.",
+            "",
+            "| Certificate noise | F1 | Keep under self-occ. | Stale absent | Survival |",
+            "| ---: | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    for row in noise_stress:
+        lines.append(
+            f"| {row['certificate_noise']} | {row['f1_mean']} | {row['occluded_keep_rate_mean']} | "
+            f"{row['stale_clear_absence_rate_mean']} | {row['occlusion_survival_rate_mean']} |"
+        )
+    lines.extend(
+        [
+            "",
+            "Interpretation: the certificate advantage depends on calibrated robot geometry. Large certificate noise lowers object-state F1 and occlusion survival, so the method should be framed as a visibility-semantics mechanism, not as a calibration-free tracker.",
+            "",
+            "## V2 Certificate-Corruption Stress",
+            "",
+            "This stress directly flips the certificate event at 42 degree self-occlusion. False negatives make real self-occlusions count as clear misses; false positives make clear misses look robot-occluded.",
+            "",
+            "| Scenario | F1 | Keep under self-occ. | Stale absent | Survival |",
+            "| --- | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    for row in corruption_stress:
+        lines.append(
+            f"| {row['scenario']} | {row['f1_mean']} | {row['occluded_keep_rate_mean']} | "
+            f"{row['stale_clear_absence_rate_mean']} | {row['occlusion_survival_rate_mean']} |"
+        )
+    lines.extend(
+        [
+            "",
+            "Interpretation: false-negative certificates destroy the persistence benefit, while false positives increase stale-object retention. The method therefore depends on conservative but not overbroad robot-visibility certificates.",
             "",
         ]
     )
@@ -387,13 +580,15 @@ def main() -> int:
     write_csv(EXPERIMENTS / "episode_results.csv", rows)
     write_summary_csv(EXPERIMENTS / "summary.csv", summary)
     write_latex_table(summary)
-    write_markdown_summary(summary)
+    noise_stress = run_certificate_noise_stress(random.Random(1616))
+    corruption_stress = run_certificate_corruption_stress(random.Random(1617))
+    write_markdown_summary(summary, noise_stress, corruption_stress)
     failures = try_write_plot(summary)
     write_status(
         "experiment complete",
         [
             f"Wrote {len(rows)} episode rows to experiments/episode_results.csv.",
-            "Wrote experiments/summary.csv, docs/experiment_summary.md, and paper/experiment_table.tex.",
+            "Wrote experiments/summary.csv, certificate stress CSVs, docs/experiment_summary.md, and paper/experiment_table.tex.",
             "If matplotlib was available, wrote figures/persistence_tradeoff.pdf/png.",
         ],
         failures,
@@ -406,4 +601,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

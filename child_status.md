@@ -1,23 +1,26 @@
 # Child Status
 
-- Stage: complete
-- Last command/tool: final verification of git status, remote HEAD, Downloads PDF, related-work row count, and final audit
+- Stage: experiment complete
+- Last command/tool: `python scripts/run_self_occlusion_experiment.py`
 - Current facts:
-  - Public GitHub repo: `https://github.com/Jason-Wang313/16_object_persistence_under_robot_occlusion`.
-  - Child run pushed completion commit `5a23aeb319cb360e22dd9e59eac779e1e0afa8f9`; parent monitor recorded Desktop-copy verification afterward.
-  - Downloads PDF exists at `C:\Users\wangz\Downloads\16.pdf` with size 165836 bytes.
-  - Desktop PDF exists at `C:\Users\wangz\OneDrive\Desktop\16.pdf` with size 165836 bytes.
-  - `docs/related_work_matrix.csv` has exactly 1000 rows.
-  - `paper/main.pdf` is absent from the repo tree and not tracked; the final compiled PDF is only at the required Downloads path.
-  - `docs/final_audit.md` contains the required 13 audit answers and the orchestrator Desktop-copy result.
+  - Wrote 1080 episode rows to experiments/episode_results.csv.
+  - Wrote experiments/summary.csv, certificate stress CSVs, docs/experiment_summary.md, and paper/experiment_table.tex.
+  - If matplotlib was available, wrote figures/persistence_tradeoff.pdf/png.
 - Failures:
-  - Initial `write_paper.py` LaTeX/f-string brace collisions were patched.
-  - MiKTeX printed update notices during compilation, but all LaTeX/BibTeX exit codes were 0.
+  - none
 - Recovery steps:
-  - Reran `write_paper.py`; compiled with direct `pdflatex`, `bibtex`, `pdflatex`, `pdflatex`, plus one extra `pdflatex`.
-- Next: none.
+  - none
+- Next: write LaTeX paper and compile.
 
+## Submission-hardening v2 terminal status
 
-Exit code: 0
-End time: 2026-06-11 14:35:43 +01:00
-PDF exists: True
+Checked: 2026-06-13 00:32:35 +01:00
+
+- Added certificate-noise stress and direct certificate-corruption stress.
+- Clean certificate corruption stress: F1 0.975, keep-under-self-occlusion 0.920, stale clear-absence 0.143.
+- 50% false-negative certificates: F1 0.930, keep-under-self-occlusion 0.674, survival 0.983.
+- 50% false-positive certificates: F1 0.948, stale clear-absence 0.544.
+- Rebuilt the manuscript and copied the canonical v2 PDF to `C:/Users/wangz/Downloads/16.pdf` (169,760 bytes).
+- Local `paper/main.pdf` was removed after the canonical copy.
+- Terminal decision: workshop-only / revise before main-conference submission.
+- No new Desktop copy created during v2 hardening.

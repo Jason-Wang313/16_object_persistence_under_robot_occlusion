@@ -18,9 +18,16 @@ Anonymous Institution \\
 
 \begin{document}
 \maketitle
+\noindent\textbf{Submission-hardening v2, 2026-06-13.}
+Added certificate-noise and certificate-corruption stresses. The paper is now
+explicit that the mechanism depends on conservative but not overbroad robot
+visibility certificates.
 
 \begin{abstract}
 Robots often lose sight of an object for a reason that is neither sensor noise nor scene disappearance: the robot itself moves between the camera and the object. Most persistent-perception pipelines treat this as an ordinary missed detection, controlled by a fixed deletion patience or by a generic memory module. This paper argues that robot self-occlusion should instead be a central observation event. We introduce an action-conditioned occlusion certificate: a kinematic test that marks when the robot body makes a predicted object state unobservable, and gates deletion only under clear-view misses. A simple non-identifiability proposition shows why observation-only misses cannot distinguish object absence from robot-caused invisibility. In a controlled 2D manipulation-inspired simulator, the certificate policy improves the object-state F1 at the hardest self-occlusion setting from 0.817 for a short missed-detection tracker to 0.973, while avoiding the stale-object behavior of indiscriminate long memory (0.149 vs. 0.423 stale clear-absence rate). The result is not a claim of real-robot state of the art; it is a mechanism-level case that persistent object state needs robot-action visibility semantics.
+A v2 corruption stress shows the boundary: 50\% certificate false negatives reduce
+self-occluded keep rate from 0.920 to 0.674, while 50\% false positives raise stale
+clear-absence rate from 0.143 to 0.544.
 \end{abstract}
 
 \section{Introduction}
@@ -114,9 +121,25 @@ We compare three policies: (1) a short TTL tracker that deletes after three cons
 \paragraph{Results.}
 Table~\ref{tab:synthetic} shows the core tradeoff. The short TTL tracker is conservative about stale absent objects, but it deletes real objects under long self-occlusions. Long memory keeps self-occluded objects, but it also keeps objects that were removed and are absent in clear view. The certificate policy improves persistence because it conditions deletion on robot-caused unobservability rather than elapsed missed frames.
 
+\begin{table}[t]
+\caption{V2 certificate-corruption stress at 42 degree self-occlusion. False negatives make real self-occlusions count as clear misses; false positives make clear misses look robot-occluded.}
+\label{tab:corruption}
+\centering
+\small
+\input{../experiments/certificate_corruption_table.tex}
+\end{table}
+
+Table~\ref{tab:corruption} makes the calibration boundary explicit. False-negative
+certificates reduce the very persistence benefit the method is meant to provide:
+at 50\% false negatives, keep-under-self-occlusion falls to 0.674. False positives
+recover the failure mode of long memory: at 50\% false positives, stale clear-absence
+rate rises to 0.544. The method therefore needs conservative visibility certificates,
+but certificates that are too broad can preserve objects that are actually gone.
+
 \section{Limitations}
 
 The evidence is synthetic and uses object identities to isolate deletion semantics. A deployed robot would need calibrated geometry, segmentation of robot links, association under clutter, state prediction during contact, and robustness to external occluders. The certificate can also be wrong: calibration error can preserve stale tracks, while an overly narrow certificate can delete real objects. These limitations are not peripheral; they define the next experimental stage.
+The v2 corruption stress quantifies this limitation rather than treating it as a footnote.
 
 \section{Reproducibility}
 
