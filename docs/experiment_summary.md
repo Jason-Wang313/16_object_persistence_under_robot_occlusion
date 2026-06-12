@@ -23,3 +23,34 @@ The simulator evaluates three deletion policies under robot self-occlusion:
 ## Interpretation
 
 Short TTL has low stale-object rates but loses tracks during long robot self-occlusion. Long memory preserves objects under occlusion but also preserves removed objects in clear view. The certificate policy targets the missing cause: it preserves only when robot geometry predicts unobservability, giving a better persistence/staleness tradeoff in this controlled setting.
+
+## V2 Certificate-Noise Stress
+
+The hardening stress reruns the certificate policy at 42 degree self-occlusion while increasing calibration noise in the certificate geometry.
+
+| Certificate noise | F1 | Keep under self-occ. | Stale absent | Survival |
+| ---: | ---: | ---: | ---: | ---: |
+| 0.00 | 0.973 | 0.909 | 0.144 | 1.000 |
+| 1.25 | 0.974 | 0.918 | 0.160 | 1.000 |
+| 3.00 | 0.974 | 0.915 | 0.142 | 1.000 |
+| 6.00 | 0.973 | 0.917 | 0.158 | 1.000 |
+| 10.00 | 0.968 | 0.902 | 0.166 | 0.998 |
+| 16.00 | 0.964 | 0.879 | 0.189 | 0.997 |
+
+Interpretation: the certificate advantage depends on calibrated robot geometry. Large certificate noise lowers object-state F1 and occlusion survival, so the method should be framed as a visibility-semantics mechanism, not as a calibration-free tracker.
+
+## V2 Certificate-Corruption Stress
+
+This stress directly flips the certificate event at 42 degree self-occlusion. False negatives make real self-occlusions count as clear misses; false positives make clear misses look robot-occluded.
+
+| Scenario | F1 | Keep under self-occ. | Stale absent | Survival |
+| --- | ---: | ---: | ---: | ---: |
+| clean | 0.975 | 0.920 | 0.143 | 1.000 |
+| false_negative_10pct | 0.973 | 0.910 | 0.144 | 1.000 |
+| false_negative_25pct | 0.970 | 0.886 | 0.122 | 0.999 |
+| false_negative_50pct | 0.930 | 0.674 | 0.084 | 0.983 |
+| false_positive_10pct | 0.970 | 0.905 | 0.174 | 1.000 |
+| false_positive_25pct | 0.966 | 0.914 | 0.238 | 1.000 |
+| false_positive_50pct | 0.948 | 0.910 | 0.544 | 1.000 |
+
+Interpretation: false-negative certificates destroy the persistence benefit, while false positives increase stale-object retention. The method therefore depends on conservative but not overbroad robot-visibility certificates.

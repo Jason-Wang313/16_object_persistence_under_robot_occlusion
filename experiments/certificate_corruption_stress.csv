@@ -1,0 +1,8 @@
+scenario,episodes,f1_mean,occluded_keep_rate_mean,stale_clear_absence_rate_mean,clear_exists_missing_rate_mean,occlusion_survival_rate_mean
+clean,120,0.975,0.920,0.143,0.000,1.000
+false_negative_10pct,120,0.973,0.910,0.144,0.001,1.000
+false_negative_25pct,120,0.970,0.886,0.122,0.000,0.999
+false_negative_50pct,120,0.930,0.674,0.084,0.001,0.983
+false_positive_10pct,120,0.970,0.905,0.174,0.000,1.000
+false_positive_25pct,120,0.966,0.914,0.238,0.001,1.000
+false_positive_50pct,120,0.948,0.910,0.544,0.000,1.000
