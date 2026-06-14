@@ -1,11 +1,21 @@
 # Experiment Rigor Checklist
 
-- Fixed seeds: yes (`1601`, `1616`, `1617`).
-- Main episodes: 3 policies x 3 occlusion widths x 120 episodes = 1,080 episodes.
-- Certificate-noise stress: 6 noise levels x 120 episodes.
-- Certificate-corruption stress: 7 corruption settings x 120 episodes.
-- Main raw output: `experiments/episode_results.csv`.
-- V2 noise output: `experiments/certificate_noise_stress.csv`.
-- V2 corruption output: `experiments/certificate_corruption_stress.csv`.
-- Manuscript tables: `paper/experiment_table.tex`, `experiments/certificate_corruption_table.tex`.
-- Remaining empirical gap: no real robot, no real association, no calibrated camera/robot geometry, no external occluders.
+- Full-scale runner: `experiments/full_scale_occlusion_certificates.py`.
+- Fixed master seed: `16016`.
+- Progress status: `complete`.
+- Total seed-row summaries: 1,124.
+- Plot failures: 0.
+- Family A geometry: 504 rows.
+- Family B calibration: 180 rows.
+- Family C corruption: 96 rows.
+- Family D external occluders: 72 rows.
+- Family E association/re-identification: 72 rows.
+- Family F hidden motion: 72 rows.
+- Family G strong baselines: 64 rows.
+- Family H ablations: 64 rows.
+- Generated raw/summary artifacts: `results/full_scale/*_seed.csv` and `results/full_scale/*_summary.csv`.
+- Generated manuscript artifacts: `results/full_scale/table_*.tex` and `results/full_scale/figure_*.pdf`.
+- Main evidence: certificate F1 0.950, keep-under-self-occlusion 0.821, stale clear-absence 0.255.
+- Key baselines: short TTL F1 0.818; long memory stale clear-absence 0.515.
+- Key negative controls: random geometry F1 0.582; no robot action F1 0.514.
+- Remaining empirical gap: no calibrated real robot, no real detector/segmentation stack, no hardware association module, no external-occluder perception model, and no contact-dynamics predictor.

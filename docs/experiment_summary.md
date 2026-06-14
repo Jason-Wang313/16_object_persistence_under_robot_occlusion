@@ -1,56 +1,57 @@
 # Experiment Summary
 
-The simulator evaluates three deletion policies under robot self-occlusion:
+The v3 suite evaluates whether action-conditioned robot self-occlusion certificates improve persistent object-state updates beyond generic missed-detection patience. It contains eight families and 1,124 seed-row summaries.
 
-- `ttl_short`: delete after three consecutive misses.
-- `long_memory`: keep tracks through long gaps regardless of visibility cause.
-- `certificate`: delete after three clear-view misses, but freeze the deletion counter when robot kinematics certify self-occlusion.
+## Families
 
-## Aggregate Results
+| Family | Rows | Purpose |
+| --- | ---: | --- |
+| A geometry | 504 | Self-occlusion width, duration, and geometry coverage. |
+| B calibration | 180 | Noise, inflation, and robot-state latency. |
+| C corruption | 96 | Direct false-negative and false-positive certificates. |
+| D external | 72 | External occluders and mixed-cause misses. |
+| E association | 72 | Identity swaps and re-identification stress. |
+| F hidden motion | 72 | Static, drift, robot-contact, and external hidden motion. |
+| G baselines | 64 | Stronger alternatives including hazard and amodal proxy policies. |
+| H ablation | 64 | Negative controls for missing, random, underbroad, and overbroad geometry. |
 
-| Occlusion width | Policy | F1 | Keep under self-occ. | Stale absent | Clear-visible missing | Survival |
-| --- | --- | ---: | ---: | ---: | ---: | ---: |
-| 18.0 | certificate | 0.990 | 0.958 | 0.085 | 0.000 | 1.000 |
-| 18.0 | long_memory | 0.962 | 0.959 | 0.462 | 0.000 | 1.000 |
-| 18.0 | ttl_short | 0.938 | 0.363 | 0.042 | 0.001 | 0.961 |
-| 30.0 | certificate | 0.984 | 0.940 | 0.098 | 0.000 | 1.000 |
-| 30.0 | long_memory | 0.961 | 0.929 | 0.450 | 0.000 | 0.998 |
-| 30.0 | ttl_short | 0.878 | 0.213 | 0.036 | 0.001 | 0.958 |
-| 42.0 | certificate | 0.973 | 0.908 | 0.149 | 0.000 | 1.000 |
-| 42.0 | long_memory | 0.951 | 0.882 | 0.423 | 0.001 | 0.992 |
-| 42.0 | ttl_short | 0.817 | 0.150 | 0.034 | 0.002 | 0.958 |
+## Main Geometry Results
 
-## Interpretation
-
-Short TTL has low stale-object rates but loses tracks during long robot self-occlusion. Long memory preserves objects under occlusion but also preserves removed objects in clear view. The certificate policy targets the missing cause: it preserves only when robot geometry predicts unobservability, giving a better persistence/staleness tradeoff in this controlled setting.
-
-## V2 Certificate-Noise Stress
-
-The hardening stress reruns the certificate policy at 42 degree self-occlusion while increasing calibration noise in the certificate geometry.
-
-| Certificate noise | F1 | Keep under self-occ. | Stale absent | Survival |
-| ---: | ---: | ---: | ---: | ---: |
-| 0.00 | 0.973 | 0.909 | 0.144 | 1.000 |
-| 1.25 | 0.974 | 0.918 | 0.160 | 1.000 |
-| 3.00 | 0.974 | 0.915 | 0.142 | 1.000 |
-| 6.00 | 0.973 | 0.917 | 0.158 | 1.000 |
-| 10.00 | 0.968 | 0.902 | 0.166 | 0.998 |
-| 16.00 | 0.964 | 0.879 | 0.189 | 0.997 |
-
-Interpretation: the certificate advantage depends on calibrated robot geometry. Large certificate noise lowers object-state F1 and occlusion survival, so the method should be framed as a visibility-semantics mechanism, not as a calibration-free tracker.
-
-## V2 Certificate-Corruption Stress
-
-This stress directly flips the certificate event at 42 degree self-occlusion. False negatives make real self-occlusions count as clear misses; false positives make clear misses look robot-occluded.
-
-| Scenario | F1 | Keep under self-occ. | Stale absent | Survival |
+| Policy | F1 | Keep self-occ. | Stale absent | Survival |
 | --- | ---: | ---: | ---: | ---: |
-| clean | 0.975 | 0.920 | 0.143 | 1.000 |
-| false_negative_10pct | 0.973 | 0.910 | 0.144 | 1.000 |
-| false_negative_25pct | 0.970 | 0.886 | 0.122 | 0.999 |
-| false_negative_50pct | 0.930 | 0.674 | 0.084 | 0.983 |
-| false_positive_10pct | 0.970 | 0.905 | 0.174 | 1.000 |
-| false_positive_25pct | 0.966 | 0.914 | 0.238 | 1.000 |
-| false_positive_50pct | 0.948 | 0.910 | 0.544 | 1.000 |
+| oracle_visibility | 0.963 | 0.821 | 0.070 | 1.000 |
+| visibility_weighted | 0.950 | 0.814 | 0.223 | 0.982 |
+| certificate | 0.950 | 0.821 | 0.255 | 1.000 |
+| long_memory | 0.916 | 0.739 | 0.515 | 0.986 |
+| hazard_filter | 0.860 | 0.332 | 0.135 | 0.936 |
+| ttl_medium | 0.854 | 0.297 | 0.118 | 0.936 |
+| ttl_short | 0.818 | 0.114 | 0.041 | 0.936 |
 
-Interpretation: false-negative certificates destroy the persistence benefit, while false positives increase stale-object retention. The method therefore depends on conservative but not overbroad robot-visibility certificates.
+Interpretation: short TTL avoids stale state but deletes present objects during self-occlusion. Long memory preserves more objects but produces high stale clear-absence. The certificate targets the cause of the miss and improves the persistence/staleness tradeoff in the self-occlusion mechanism family.
+
+## Calibration Boundary
+
+At noise 6, inflation 2, and latency 3, the certificate policy reaches F1 0.926 with certificate precision 0.685, recall 0.844, and stale clear-absence 0.196. At noise 16 and inflation 2, F1 falls to 0.885. The method must be framed as calibration-dependent.
+
+## Corruption Boundary
+
+| FN | FP | F1 | Keep | Stale |
+| ---: | ---: | ---: | ---: | ---: |
+| 0.000 | 0.000 | 0.960 | 0.865 | 0.176 |
+| 0.500 | 0.000 | 0.856 | 0.322 | 0.072 |
+| 0.000 | 0.500 | 0.960 | 0.921 | 0.293 |
+| 0.000 | 0.750 | 0.920 | 0.883 | 0.681 |
+
+Interpretation: false negatives destroy the persistence benefit; false positives recreate stale memory. Certificate precision and recall must be reported separately.
+
+## Boundary Results
+
+- External occluders need separate semantics: at external rate 0.15, long memory reaches F1 0.789 but with external stale 0.176 and clear stale 0.167; the external-aware certificate reaches F1 0.357 with much lower stale rates.
+- Association remains a blocker: at 30% swap, certificate F1 is 0.920 but ID switches average 413.556.
+- Hidden motion is not solved by persistence: robot-contact reappearance error is 0.539 even though certificate F1 is 0.957.
+- Strong baselines optimize different losses: in a mixed external setting, long memory reaches F1 0.899 with stale 0.488, while certificate reaches F1 0.723 with stale 0.078.
+- Random or missing robot geometry is insufficient: random geometry F1 is 0.582 and no robot action F1 is 0.514.
+
+## Generated Artifacts
+
+Source-of-truth outputs are under `results/full_scale/`: family seed CSVs, family summary CSVs, generated tables, generated figures, `metadata.json`, and `progress.json`.

@@ -1,0 +1,12 @@
+\begin{tabular}{lll}
+\toprule
+Claim & Evidence & Result \\
+\midrule
+Self-occlusion is not a generic miss & Family A & cert F1 0.950 \\
+Calibration has a precision/recall boundary & Family B & noise 6 F1 0.926 \\
+False positives preserve stale objects & Family C & FP50 stale 0.293 \\
+External occluders need separate semantics & Family D & external aware F1 0.357 \\
+Association remains a deployment blocker & Family E & swap30 F1 0.920 \\
+Ablations break the mechanism & Family H & random geom F1 0.582 \\
+\bottomrule
+\end{tabular}
