@@ -1,26 +1,18 @@
 # Child Status
 
-- Stage: experiment complete
-- Last command/tool: `python scripts/run_self_occlusion_experiment.py`
+- Stage: full-scale v3 final artifact exported and verified.
+- Last major command/tool: `python experiments/full_scale_occlusion_certificates.py`
 - Current facts:
-  - Wrote 1080 episode rows to experiments/episode_results.csv.
-  - Wrote experiments/summary.csv, certificate stress CSVs, docs/experiment_summary.md, and paper/experiment_table.tex.
-  - If matplotlib was available, wrote figures/persistence_tradeoff.pdf/png.
+  - Full-scale runner completed with stage `complete`.
+  - Wrote 1,124 seed-row summaries across eight experiment families.
+  - Generated CSV summaries, LaTeX tables, PDF/PNG figures, `metadata.json`, and `progress.json` under `results/full_scale/`.
+  - Manuscript imports v3 generated figures and tables and compiled to 25 pages before export.
+  - Canonical final PDF is `C:/Users/wangz/Downloads/16.pdf`, 25 pages, 382,537 bytes, SHA256 `B74479204FE59A984915A9ECDD763BC796290AE7BE304C4B16CBDEE973C4F0A4`.
+  - Local `paper/main.pdf` was removed after the canonical copy.
+  - Current claim is mechanism-level: robot self-occlusion changes missed-detection semantics; this is not a real-robot state-of-the-art claim.
 - Failures:
-  - none
+  - none in the final v3 runner; plot failures were 0.
 - Recovery steps:
-  - none
-- Next: write LaTeX paper and compile.
-
-## Submission-hardening v2 terminal status
-
-Checked: 2026-06-13 00:32:35 +01:00
-
-- Added certificate-noise stress and direct certificate-corruption stress.
-- Clean certificate corruption stress: F1 0.975, keep-under-self-occlusion 0.920, stale clear-absence 0.143.
-- 50% false-negative certificates: F1 0.930, keep-under-self-occlusion 0.674, survival 0.983.
-- 50% false-positive certificates: F1 0.948, stale clear-absence 0.544.
-- Rebuilt the manuscript and copied the canonical v2 PDF to `C:/Users/wangz/Downloads/16.pdf` (169,760 bytes).
-- Local `paper/main.pdf` was removed after the canonical copy.
-- Terminal decision: workshop-only / revise before main-conference submission.
-- No new Desktop copy created during v2 hardening.
+  - none required.
+- Next:
+  - Commit, push, and verify upstream match before moving to paper 17.

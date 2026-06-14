@@ -1,0 +1,38 @@
+{
+  "master_seed": 16016,
+  "families": [
+    "geometry_coverage",
+    "certificate_calibration",
+    "certificate_corruption",
+    "external_occluders",
+    "association_reidentification",
+    "hidden_motion",
+    "strong_baselines",
+    "ablation"
+  ],
+  "headline": {
+    "cert_f1": 0.9499704715549796,
+    "short_f1": 0.8181501318348697,
+    "long_stale": 0.5147878078442089,
+    "cert_stale": 0.2545613423399386,
+    "cert_keep": 0.8208475247901651,
+    "noise6_f1": 0.925816370247547,
+    "noise6_precision": 0.6852180697526501,
+    "noise6_recall": 0.8437663027584009,
+    "fp50_stale": 0.29267245045713985,
+    "fn50_keep": 0.32232310436369266,
+    "external_aware_f1": 0.35711528430612743,
+    "swap30_f1": 0.9204798466876464,
+    "random_geometry_f1": 0.5817973024845621
+  },
+  "seed_rows": {
+    "A": 504,
+    "B": 180,
+    "C": 96,
+    "D": 72,
+    "E": 72,
+    "F": 72,
+    "G": 64,
+    "H": 64
+  }
+}
