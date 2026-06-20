@@ -27,3 +27,12 @@ Paper16 v3 is supported by a full-scale synthetic mechanism suite, not by hardwa
 ## Final Scope
 
 The final claim is mechanism-level: action-conditioned robot visibility changes how missed detections should update persistent object state. The paper does not claim calibrated hardware performance, solved external occlusion, solved association, or solved hidden-state dynamics.
+
+## Final PDF
+
+- Path: `C:/Users/wangz/Downloads/16.pdf`
+- Pages: 25
+- Size: 382,537 bytes
+- SHA256: `654F284A02E2AD6E9D267AC07BE40F9ACD0CEDC0B61A1719A61064C62C776598`
+- VLA-style boxed-link audit: 46 annotations on pages `[(2, 40), (4, 3), (5, 3)]`; green = 40, red = 6, cyan = 0; all borders `(0, 0, 1)`.
+- Visual audit: rendered pages 2, 4, and 5 after export; citation/URL and internal-reference boxes are crisp and aligned.

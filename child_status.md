@@ -1,13 +1,16 @@
 # Child Status
 
-- Stage: full-scale v3 final artifact exported and verified.
-- Last major command/tool: `python experiments/full_scale_occlusion_certificates.py`
+- Stage: VLA-style boxed-link hardening complete; final artifact exported and verified.
+- Last major command/tool: manual `pdflatex`, `bibtex`, `pdflatex`, `pdflatex` rebuild from `paper/`
 - Current facts:
   - Full-scale runner completed with stage `complete`.
   - Wrote 1,124 seed-row summaries across eight experiment families.
   - Generated CSV summaries, LaTeX tables, PDF/PNG figures, `metadata.json`, and `progress.json` under `results/full_scale/`.
   - Manuscript imports v3 generated figures and tables and compiled to 25 pages before export.
-  - Canonical final PDF is `C:/Users/wangz/Downloads/16.pdf`, 25 pages, 382,537 bytes, SHA256 `B74479204FE59A984915A9ECDD763BC796290AE7BE304C4B16CBDEE973C4F0A4`.
+  - `paper/main.tex` now explicitly locks the VLA-style hyperref policy: green citation/URL boxes, red internal-reference boxes, and one-point PDF borders.
+  - Canonical final PDF is `C:/Users/wangz/Downloads/16.pdf`, 25 pages, 382,537 bytes, SHA256 `654F284A02E2AD6E9D267AC07BE40F9ACD0CEDC0B61A1719A61064C62C776598`.
+  - Final link inventory: 46 annotations on pages `[(2, 40), (4, 3), (5, 3)]`; colors green = 40, red = 6, cyan = 0; all borders `(0, 0, 1)`.
+  - Rendered and visually inspected pages 2, 4, and 5; highlighted boxes are crisp and aligned.
   - Local `paper/main.pdf` was removed after the canonical copy.
   - Current claim is mechanism-level: robot self-occlusion changes missed-detection semantics; this is not a real-robot state-of-the-art claim.
 - Failures:
@@ -15,4 +18,4 @@
 - Recovery steps:
   - none required.
 - Next:
-  - Commit, push, and verify upstream match before moving to paper 17.
+  - Commit, push, and verify upstream match before moving to paper 15.

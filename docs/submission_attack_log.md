@@ -1,6 +1,6 @@
 # Submission Attack Log
 
-Checked: 2026-06-14
+Checked: 2026-06-20
 
 ## Hostile Round 1: The certificate depends on calibration
 
@@ -43,3 +43,9 @@ Action: Added Family G strong baselines. In the mixed external setting, long mem
 Result: Rejected by ablation.
 
 Action: Added Family H ablations. Random geometry falls to F1 0.582 and no robot action falls to F1 0.514.
+
+## Hostile Round 8: PDF link styling may silently drift from the VLA role model
+
+Result: Incorporated.
+
+Action: Added explicit `\hypersetup` policy in `paper/main.tex`, rebuilt the final PDF, and verified 46 boxed link annotations: green = 40, red = 6, cyan = 0, all with border `(0, 0, 1)`. Rendered affected pages 2, 4, and 5 and confirmed the boxes are visually crisp and aligned.

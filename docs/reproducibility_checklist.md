@@ -57,3 +57,13 @@ Acceptance checks:
 - `pdfinfo paper/main.pdf` reports at least 25 pages before final export.
 - `main.log` has no fatal LaTeX errors, undefined references, or overfull boxes.
 - `pdftotext paper/main.pdf -` finds the v3 marker, 1,124-row claim, main metrics, and artifact-to-claim audit.
+
+## Final Export Verification
+
+- Canonical PDF: `C:/Users/wangz/Downloads/16.pdf`
+- Pages: 25
+- Size: 382,537 bytes
+- SHA256: `654F284A02E2AD6E9D267AC07BE40F9ACD0CEDC0B61A1719A61064C62C776598`
+- VLA-style boxed-link inventory: 46 annotations on pages `[(2, 40), (4, 3), (5, 3)]`; green = 40, red = 6, cyan = 0; all borders `(0, 0, 1)`.
+- Visual render audit: pages 2, 4, and 5 checked after export.
+- Local build artifact: `paper/main.pdf` removed after export.

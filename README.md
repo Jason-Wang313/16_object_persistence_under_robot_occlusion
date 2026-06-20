@@ -74,5 +74,12 @@ Final v3 export:
 
 - Pages: 25.
 - Size: 382,537 bytes.
-- SHA256: `B74479204FE59A984915A9ECDD763BC796290AE7BE304C4B16CBDEE973C4F0A4`.
+- SHA256: `654F284A02E2AD6E9D267AC07BE40F9ACD0CEDC0B61A1719A61064C62C776598`.
 - Local `paper/main.pdf`: removed after the canonical copy.
+
+VLA-style boxed-link verification:
+
+- Link annotations: 46 total on pages `[(2, 40), (4, 3), (5, 3)]`.
+- Annotation colors: green = 40, red = 6, cyan = 0.
+- Border widths: `(0, 0, 1)` for all link annotations.
+- Visual audit: rendered pages 2, 4, and 5; green citation/URL boxes and red internal-reference boxes are crisp and aligned.

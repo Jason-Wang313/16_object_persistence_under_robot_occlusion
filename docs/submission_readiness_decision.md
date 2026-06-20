@@ -6,6 +6,8 @@ The v3 paper has a clean central mechanism, a formal non-identifiability proposi
 
 The paper should still be scoped carefully. It does not claim real-robot state of the art, solved external occlusion, solved association, solved detector segmentation, or solved contact-rich hidden motion. Those are named as future hardware validation requirements rather than hidden weaknesses.
 
+The 2026-06-20 export also matches the visible VLA-v4 boxed-link convention: green citation/URL boxes, red internal-reference boxes, one-point borders, and no cyan link boxes in the audited final PDF.
+
 ## Evidence That Supports Readiness
 
 - Main geometry family: certificate F1 0.950 versus short TTL F1 0.818.
