@@ -1,6 +1,6 @@
 # Final Audit
 
-Checked: 2026-06-14
+Checked: 2026-06-20
 
 1. **Chosen thesis:** Persistent object state under robot self-occlusion should be updated by action-conditioned occlusion certificates, not by generic missed-detection patience.
 2. **Field assumption broken:** A missed detection is not a single exchangeable event; robot self-occlusion makes some misses non-evidence of absence, while clear-view misses are evidence against persistence.
@@ -16,7 +16,9 @@ Checked: 2026-06-14
 12. **Readiness judgment:** Final under the current full-scale mechanism-paper standard. Scope must remain honest: this is not a calibrated hardware systems or real-robot state-of-the-art claim.
 13. **Exact Downloads PDF path:** `C:/Users/wangz/Downloads/16.pdf`.
 14. **Downloads PDF verification:** 25 pages, 382,537 bytes, PDF 1.5.
-15. **Downloads PDF SHA256:** `B74479204FE59A984915A9ECDD763BC796290AE7BE304C4B16CBDEE973C4F0A4`.
+15. **Downloads PDF SHA256:** `654F284A02E2AD6E9D267AC07BE40F9ACD0CEDC0B61A1719A61064C62C776598`.
 16. **Required text markers found in exported PDF:** v3 marker, `1,124`, `0.950`, `0.818`, `0.255`, `0.926`, `0.322`, and `Artifact-To-Claim`.
-17. **Local build PDF status:** `paper/main.pdf` removed after the canonical Downloads copy.
-18. **GitHub URL:** `https://github.com/Jason-Wang313/16_object_persistence_under_robot_occlusion`.
+17. **VLA-style boxed-link audit:** 46 link annotations on pages `[(2, 40), (4, 3), (5, 3)]`; colors green = 40, red = 6, cyan = 0; all borders `(0, 0, 1)`.
+18. **Visual link audit:** pages 2, 4, and 5 rendered after export; green citation/URL boxes and red internal-reference boxes are crisp and aligned.
+19. **Local build PDF status:** `paper/main.pdf` removed after the canonical Downloads copy.
+20. **GitHub URL:** `https://github.com/Jason-Wang313/16_object_persistence_under_robot_occlusion`.

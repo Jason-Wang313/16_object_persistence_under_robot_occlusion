@@ -245,3 +245,22 @@ Paper 16 is not final until all are true:
 - Local `paper/main.pdf` is removed after final copy.
 - Commit is pushed.
 - Worktree is clean and `HEAD` matches upstream before moving to Paper 17.
+
+## VLA-Style Link Hardening Addendum
+
+Date: 2026-06-20
+
+After the v3 export, the PDF link presentation was hardened to match the visible
+VLA-v4 role model without changing manuscript content or experiment results.
+The manuscript now explicitly sets green citation/URL boxes, red
+internal-reference boxes, and one-point PDF borders through `hyperref`.
+
+Post-export audit for `C:/Users/wangz/Downloads/16.pdf`:
+
+- Pages: 25
+- Size: 382,537 bytes
+- SHA256: `654F284A02E2AD6E9D267AC07BE40F9ACD0CEDC0B61A1719A61064C62C776598`
+- Link annotations: 46 total on pages `[(2, 40), (4, 3), (5, 3)]`
+- Colors: green = 40, red = 6, cyan = 0
+- Borders: `(0, 0, 1)` for every link annotation
+- Visual audit: rendered pages 2, 4, and 5; link boxes are crisp and aligned.
